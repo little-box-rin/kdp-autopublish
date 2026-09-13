@@ -192,6 +192,21 @@ async def fill_tab1_details(page, config):
             await page.click('[value="AI_ASSISTED"], [value="ai_used"]', timeout=3000)
     except: pass
 
+    # AI-generated content checkbox — ALWAYS check (our pipeline uses AI-generated images)
+    try:
+        await page.locator('text=AI-generated, text=Contenuto generato da intelligenza artificiale').first.check(timeout=3000)
+        print("    ✅ AI-generated content checkbox: checked")
+    except:
+        try:
+            await page.locator('[id*="ai-generated"], [id*="ai_generated"], [aria-label*="AI"]').first.check(timeout=2000)
+            print("    ✅ AI-generated content checkbox (id): checked")
+        except:
+            try:
+                await page.get_by_role("checkbox").filter(has_text=re.compile(r"AI|intelligenza|artificiale|generat")).first.check(timeout=2000)
+                print("    ✅ AI-generated content checkbox (filter): checked")
+            except:
+                print("    ⚠️ AI-generated content checkbox: non trovato (selettore fallback)")
+
     await page.wait_for_timeout(500)
 
     # Keywords (7 campi separati)
